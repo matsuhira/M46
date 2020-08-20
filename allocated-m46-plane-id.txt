@@ -1,0 +1,12 @@
+m46 plane id (32bit)
+
+----------------------------
+
+plane id value (Hex)      allocate to                   contact         allocated date
+0000:0000                 IPv4 Global address plane     matsuhira       2020/8/20
+0000:0001 - FFFE:FFFF     Reserved
+
+FFFF:0000 - FFFF:FFEF     
+
+FFFF:FFF0 - FFFF:FFFF     for tempolary use             matsuhira       2020/8/20
+
