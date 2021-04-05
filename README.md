@@ -14,5 +14,27 @@ https://www.github.com/matsuhira/m46e-mod<br>
 https://www.gitgub.com/matsuhira/m46e-app<br>
 https://www.github.com/matsuhira/mx6e-pr<br>
 
+## patent statement
+* M46A<br>
+https://datatracker.ietf.org/ipr/4410/<br>
+https://datatracker.ietf.org/ipr/2751/
+* M46E-FP<br>
+https://datatracker.ietf.org/ipr/4409/<br>
+https://datatracker.ietf.org/ipr/2752/
+* M46E-PR<br>
+https://datatracker.ietf.org/ipr/4522/<br>
+https://datatracker.ietf.org/ipr/4425/<br>
+https://datatracker.ietf.org/ipr/2753/
+* M46E-PT<br>
+https://datatracker.ietf.org/ipr/4523/<br>
+https://datatracker.ietf.org/ipr/4426/<br>
+https://datatracker.ietf.org/ipr/2754/
+* M46T<br>
+https://datatracker.ietf.org/ipr/4408/<br>
+https://datatracker.ietf.org/ipr/4408/
+* M4P6E<br>
+https://datatracker.ietf.org/ipr/4407/<br>
+https://datatracker.ietf.org/ipr/2756/
+
 
 
