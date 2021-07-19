@@ -8,17 +8,17 @@ https://tools.ietf.org/html/draft-matsuhira-m46e-pt-08<br>
 https://tools.ietf.org/html/draft-matsuhira-m46t<br>
 
 ## presentation (some)
-* 2013/7: 87th IETF Berlin: SA46T, SA46T-PR and SA46T-PT
-https://www.ietf.org/proceedings/87/slides/slides-87-softwire-20.pdf
+* 2013/7: 87th IETF Berlin: SA46T, SA46T-PR and SA46T-PT<br>
+https://www.ietf.org/proceedings/87/slides/slides-87-softwire-20.pdf<br>
 
-* 2012/6/13: Interop Tokyo 2012: Open Router Competition
-https://www.kri.sfc.keio.ac.jp/report/mori/2012/b-006/index.html
+* 2012/6/13: Interop Tokyo 2012: Open Router Competition<br>
+https://www.kri.sfc.keio.ac.jp/report/mori/2012/b-006/index.html<br>
 
-* 2010/4/23: 3rd IPv6 operations forum (in Japan) / 第3回IPv6オペレーションズフォーラム: SA46Tのご紹介
-https://www.slideshare.net/naokimatsuhira/sa46t
+* 2010/4/23: 3rd IPv6 operations forum (in Japan) / 第3回IPv6オペレーションズフォーラム: SA46Tのご紹介<br>
+https://www.slideshare.net/naokimatsuhira/sa46t<br>
 
-* 2010/3 : 77th IETF Anaheim: Stateless automatic IPv4 over IPv6 Tunneling (SA46T)
-https://tools.ietf.org/agenda/77/slides/v6ops-6.pdf
+* 2010/3 : 77th IETF Anaheim: Stateless automatic IPv4 over IPv6 Tunneling (SA46T)<br>
+https://tools.ietf.org/agenda/77/slides/v6ops-6.pdf<br>
 
 
 ## implementation
