@@ -1,5 +1,11 @@
 # M46: Multiple IPv4 -IPv6 address mapping
 
+## about
+M46は、IPv4からIPv6へのアドレスマッピング技術を使用して、IPv6ネットワーク上でIPv4サービスの継続性を実現します。プライベートネットワークもサポートします。更に、IPv4-IPv6変換技術もあります。<br>
+M46 enables IPv4 services continuity over IPv6 networks using address mapping technology from IPv4 to IPv6. Also supports private networks. In addition, there is also IPv4-IPv6 translation technology.<br>
+* more info
+https://github.com/matsuhira/M46/blob/master/about_m46.md<br>
+
 ## spec
 https://tools.ietf.org/html/draft-matsuhira-m46a<br>
 https://tools.ietf.org/html/draft-matsuhira-m46e-fp<br>
