@@ -1,6 +1,6 @@
 # M46: Multiple IPv4 -IPv6 address mapping
 
-## about
+## abstract / 概要
 M46は、IPv4からIPv6へのアドレスマッピング技術を使用して、IPv6ネットワーク上でIPv4サービスの継続性を実現します。プライベートネットワークもサポートします。更に、IPv4-IPv6変換技術もあります。<br>
 M46 enables IPv4 services continuity over IPv6 networks using address mapping technology from IPv4 to IPv6. Also supports private networks. In addition, there is also IPv4-IPv6 translation technology.<br>
 * more info (Japanese)<br>
@@ -8,14 +8,14 @@ https://github.com/matsuhira/M46/blob/master/about_m46.md<br>
 * more info (English)<br>
 https://github.com/matsuhira/M46/blob/master/about_m46_en.md<br>
 
-## spec
+## spec / 仕様
 https://tools.ietf.org/html/draft-matsuhira-m46a<br>
 https://tools.ietf.org/html/draft-matsuhira-m46e-fp<br>
 https://tools.ietf.org/html/draft-matsuhira-m46e-pr<br>
 https://tools.ietf.org/html/draft-matsuhira-m46e-pt-08<br>
 https://tools.ietf.org/html/draft-matsuhira-m46t<br>
 
-## presentation (some)
+## presentation (some) / プレゼンテーション
 * 2013/7: 87th IETF Berlin: SA46T, SA46T-PR and SA46T-PT<br>
 https://www.ietf.org/proceedings/87/slides/slides-87-softwire-20.pdf<br>
 
@@ -29,7 +29,7 @@ https://www.slideshare.net/naokimatsuhira/sa46t<br>
 https://tools.ietf.org/agenda/77/slides/v6ops-6.pdf<br>
 
 
-## implementation
+## implementation / 実装
 https://www.github.com/upa/sa46t<br>
 https://www.github.com/edenden/sa46t-at<br>
 https://www.github.com/matsuhira/m46e-mod<br>
