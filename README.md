@@ -54,7 +54,7 @@ https://datatracker.ietf.org/ipr/4426/<br>
 https://datatracker.ietf.org/ipr/2754/
 * M46T<br>
 https://datatracker.ietf.org/ipr/4408/<br>
-https://datatracker.ietf.org/ipr/4408/
+https://datatracker.ietf.org/ipr/2755/
 * M4P6E<br>
 https://datatracker.ietf.org/ipr/4407/<br>
 https://datatracker.ietf.org/ipr/2756/
