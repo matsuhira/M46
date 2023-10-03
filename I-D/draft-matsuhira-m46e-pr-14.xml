@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-matsuhira-m46e-pr-14" ipr="trust200902">
+  <front>
+    <title abbrev="M46E-PR">Multiple IPv4 - IPv6 address mapping encapsulation
+    - prefix resolution (M46E-PR)</title>
+
+    <author fullname="Naoki Matsuhira" initials="N." surname="Matsuhira">
+      <organization>WIDE Project</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <code/>
+
+          <region/>
+
+          <country>Japan</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>naoki.matsuhira@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="4" month="April" year="2023"/>
+
+    <area/>
+
+    <workgroup/>
+
+    <keyword>IPv6</keyword>
+
+    <keyword>IPv4</keyword>
+
+    <abstract>
+      <t>This document specifies M46E Prefix Resolution (M46E-PR)
+      specification. M46E-PR connect IPv4 stub networks between IPv6 backbone
+      network. And also, M46E-PR can stack many IPv4 networks, i.e. the
+      nwtworks using same IPv4 private addresses without interdependence.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>This document provide M46E Prefix Resolution (M46E-PR)
+      specification.</t>
+
+      <t>The basic strategy for IPv6 deployment is dual stack. However,
+      because of exhaustion of IPv4 address, there will be no IPv4 addresses
+      for configuring dual stack in near future. That means there will be IPv6
+      only networks automatically.</t>
+
+      <t>However, there are many IPv4 only networks still exist and those
+      seems continuous use in near future. That means methods continuous use
+      of IPv4 network over IPv6 only network will be required.</t>
+
+      <t>M46E-PR also provide such methots.</t>
+
+      <t/>
+    </section>
+
+    <section title="Basic Network Configuration">
+      <t><xref target="Fig-network-configuration"/> shows network
+      configuration with M46E-PR. The network consists of three parts,
+      backbone network, stub network, and M46E-PR.</t>
+
+      <t>Backbone network can be operated with IPv6 only. Stub network has
+      three cases, IPv4 only, Dual Stack (both IPv4 and IPv6), and IPv6
+      only.</t>
+
+      <t>M46E-FP connects backbone network and stub network in case IPv4 still
+      works in that stub network. If stub network is IPv6 only, M46E-PR is not
+      needed.</t>
+
+      <t><figure anchor="Fig-network-configuration">
+          <artwork><![CDATA[    /---------------------------------------------------\
+    |                                                   |
+    |                  Backbone Network                 |
+    |                    (IPv6 only)                    |
+    |                                                   |
+    \---------------------------------------------------/
+           |                   |                |
+           |                   |                |
+           |                   |                |
+      +----------+       +----------+           |
+    /-| M46E-PR  |-\   /-| M46E-PR  |-\   /--------------\
+    | +----------+ |   | +----------+ |   |              |
+    |              |   |              |   |              |
+    | Stub Network |   | Stub Network |   | Stub Network |
+    | (IPv4 only)  |   | (Dual Stack) |   | (IPv6 only)  |
+    |              |   |              |   |              |
+    \--------------/   \--------------/   \--------------/
+
+]]></artwork>
+        </figure></t>
+
+      <t/>
+    </section>
+
+    <section title="Basic Function of M46E-PR">
+      <t>M46E-PR has mainly two function. One is IPv4 over IPv6 Encapsulation
+      / Decapsulation, and another is generate a table where IPv4 stub network
+      belong to IPv6 network.</t>
+
+      <section title="IPv4 over IPv6 Encapsulation / Decapsulation">
+        <t>M46E-PR excapsulates IPv4 packet to IPv6 from stub network to
+        backbone network, and decapsulates IPv6 packet to IPv4 from backbone
+        network to stub network. <xref target="Fig-encap-decap"/> shows packet
+        format on both backbone network and stub network.</t>
+
+        <t/>
+
+        <figure anchor="Fig-encap-decap">
+          <artwork><![CDATA[
+     +--------+------------+       +----------+--------+------------+
+     |IPv4 Hdr|    Data    |  -->  | IPv6 Hdr |IPv4 Hdr|    Data    |
+     +--------+------------+       +----------+--------+------------+
+
+     +--------+------------+       +----------+--------+------------+
+     |IPv4 Hdr|    Data    |  <--  | IPv6 Hdr |IPv4 Hdr|    Data    |
+     +--------+------------+       +----------+--------+------------+
+
+
+    /-------------------\  +----------+  /-----------------------------\
+    |   Stub Network    |--| M46E-PR  |--|       Backbone Network      |
+    |      (IPv4)       |  +----------+  |         (IPv6 only)         |
+    \-------------------/                \-----------------------------/
+
+
+]]></artwork>
+        </figure>
+
+        <t/>
+
+        <t/>
+      </section>
+
+      <section title="M46A architecture">
+        <t/>
+
+        <t>M46A is a IPv6 address used in outer IPv6 header which encapsulate
+        IPv4 packet by M46E-PR. M46A is described in <xref
+        target="I-D.draft-matsuhira-m46a"/>.<xref target="Fig-M46E-PR-addr"/>
+        shows M46A address architecture.</t>
+
+        <t><figure anchor="Fig-M46E-PR-addr">
+            <artwork><![CDATA[    |        96 - m bits       |         m bits         |     32 bits  |
+    +--------------------------+------------------------+--------------+
+    |        M46A prefix       | IPv4 network plane ID  | IPv4 address |
+    +--------------------------+------------------------+--------------+
+]]></artwork>
+          </figure></t>
+
+        <t>M46E address consists of three parts as follows.</t>
+
+        <t/>
+
+        <t><list style="hanging">
+            <t hangText="M46A prefix"><vspace blankLines="1"/>M46A prefix.
+            This value is not a fixed value, and resolved packet by packet</t>
+
+            <t hangText="IPv4 network plane ID">IPv4 network plane ID is an
+            identifier of IPv4 network stack over IPv6 backbone network.</t>
+
+            <t hangText="IPv4 address"><vspace blankLines="1"/>IPv4 address in
+            inner IPv4 packet.</t>
+          </list></t>
+
+        <t/>
+      </section>
+
+      <section title="Resolving M46A">
+        <t>M46E-PR resolve M46A using M46E Prefix Resolution Table (M46E-PR
+        Table). M46E-PR generate M46E-PR address resolving M46A prefix from
+        IPv4 network plane ID and IPv4 address. Figure<xref
+        target="Fig-addr-resolve"/> show this processing.</t>
+
+        <t><figure anchor="Fig-addr-resolve">
+            <artwork><![CDATA[    |        96 - m bits       |         m bits         |     32 bits  |
+    +--------------------------+------------------------+--------------+
+    |        M46A prefix       | IPv4 network plane ID  | IPv4 address |
+    +--------------------------+------------------------+--------------+
+
+    \--------------------------/\--------------------------------------/
+               ^                                     |
+               |                                     |
+               |                                     v
+    +------------------------------------------------------------------+
+    |                                                                  |
+    |        M46E Prefix Resolution Table (M46E-PR Table)              |
+    |                                                                  |
+    +------------------------------------------------------------------+
+]]></artwork>
+          </figure></t>
+
+        <t>Figure <xref target="Fig-sa46t-pr-tab"/>show M46E-PR Table. This
+        table consists four parts, IPv4 network plane ID, IPv4 address,
+        netmask, and M46A prefix.</t>
+
+        <t><figure anchor="Fig-sa46t-pr-tab">
+            <artwork><![CDATA[   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            |
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+                 :              :               :
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+]]></artwork>
+          </figure></t>
+
+        <t>M46E-PR configured IPv4 network plane ID, so M46E-PR know IPv4
+        network plane ID value the interface belongs.</t>
+
+        <t>Resolving destination address, M46E-PR use pre-configured IPv4
+        network plane ID valude, and destination address of IPv4 packets, and
+        serch the M46E-PR table. M46E-PR table return the M46E-PR address
+        prefix value correspoiding IPv4 network plane ID and IPv4 destination
+        address. Then M46E-PR generate whole M46E-PR address.</t>
+
+        <t>Resolving source address, M46E-PR already know IPv4 network plane
+        ID value and IPv6 address prefix as M46E-PR prefix. So, searching the
+        M46E-PR table does not require for resolving source address.</t>
+
+        <t/>
+      </section>
+    </section>
+
+    <section title="Mode of M46E-PR">
+      <t>M46E-PR has two working mode, one is router mode, another is host
+      mode.</t>
+
+      <section title="Router mode">
+        <t>In router mode, M46E-PR act as a IPv6 router. M46E-PR occupy IPv6
+        subnet, and M46E-PR advertise route for M46E-PR.</t>
+      </section>
+
+      <section title="Host mode">
+        <t>In host mode, M46E-PR act as a IPv6 host. M46E-PR share IPv4
+        subnet, that mean, M46E-PR and IPv6 hosts exists on same IPv6 subnet.
+        M46E-PR do proxy NDP function for IPv4 host.</t>
+      </section>
+    </section>
+
+    <section title="Sample configuration">
+      <t>Figure <xref target="Fig-sample-network"/>shows sample confiuration
+      of M46E-PR. In this example, there are three IPv4 stub network with the
+      same IPv4 network plane.</t>
+
+      <t><figure anchor="Fig-sample-network">
+          <artwork><![CDATA[
+ /------------\  /--------------------------------------/
+ |            |  | Stub Network #1                      |
+ |            |  |  2001:0db8:0:1::/64                  |
+ |            |  | +--------+  /----------------------\ |
+ |            |--| |M46E-PR |--|10.1.1.0/24(plane 1)  | |
+ |            |  | +--------+  |                      | |
+ |            |  |             \----------------------/ |
+ |           <--[2001:0db8:0:1::/64]                    |
+ |            |  /--------------------------------------/
+ |            |
+ |            |  /--------------------------------------/
+ |            |  | Stub Network #2                      |
+ |            |  |  2001:0db8:0:2::/64                  |
+ | Backbone   |  | +--------+  /----------------------\ |
+ | Network    |--| |M46E-PR |--|10.1.2.0/24(plane 1)  | |
+ |            |  | +--------+  |                      | |
+ |            |  |             \----------------------/ |
+ |           <--[2001:0db8:0:2::/64]                    |
+ |            |  /--------------------------------------/
+ |            |
+ |            |  /--------------------------------------/
+ |            |  | Stub Network #3                      |
+ |            |  |  2001:0db8:0:3::/64                  |
+ |            |  | +--------+  /----------------------\ |
+ |            |--| |M46E-PR |--|10.1.3.0/24(plane 1)  | |
+ |            |  | +--------+  |                      | |
+ |            |  |             \----------------------/ |
+ |           <--[2001:0db8:0:3::/64]                    |
+ |            |  /--------------------------------------/
+ |            |
+ \------------/
+]]></artwork>
+        </figure></t>
+
+      <t>Figure <xref target="Fig-sample-table"/> shows M46E-PR table for
+      sample network.</t>
+
+      <t/>
+
+      <figure anchor="Fig-sample-table">
+        <artwork><![CDATA[   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46E-PR address prefix |
+   +---------------------+------------+-------++-----------------------+
+   |        1            | 10.1.1.0   | /120  || 2001:0db8:0:1         |
+   |        1            | 10.1.2.0   | /120  || 2001:0db8:0:2         |
+   |        1            | 10.1.3.0   | /120  || 2001:0db8:0:3         |
+   +---------------------+------------+-------++-----------------------+
+   ]]></artwork>
+      </figure>
+
+      <t/>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document makes no request of IANA.</t>
+
+      <t>Note to RFC Editor: this section may be removed on publication as an
+      RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Security Considerations does not discussed in this memo.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+
+      <reference anchor="I-D.draft-matsuhira-m46a">
+        <front>
+          <title>Multiple IPv4 - IPv6 mapped IPv6 address</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization/>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+    </references>
+  </back>
+</rfc>
