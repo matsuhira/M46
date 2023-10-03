@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-matsuhira-m4p6e-14" ipr="trust200902">
+  <front>
+    <title abbrev="M4P6E">Multiple IPv4 address and port number - IPv6 address
+    mapping encapsulation (M4P6E)</title>
+
+    <author fullname="Naoki Matsuhira" initials="N." surname="Matsuhira">
+      <organization>WIDE Project</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <code/>
+
+          <region/>
+
+          <country>Japan</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>naoki.matsuhira@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="4" month="April" year="2023"/>
+
+    <area/>
+
+    <workgroup/>
+
+    <keyword>IPv6</keyword>
+
+    <keyword>Draft</keyword>
+
+    <abstract>
+      <t>This document specifies Multiple IPv4 address and port number - IPv6
+      address mapping encapulation (M4P6E) specification.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section anchor="Sec-Introduction" title="Introduction">
+      <t>This document provides Multiple IPv4 address and port number - IPv6
+      address mapping encapulation (M4P6E) base specification.</t>
+
+      <t>M4P6E provide IPv4 address sharing function without Network Address
+      Translation (<xref target="RFC1631">NAT</xref>). M4P6E require IPv6
+      network.</t>
+
+      <t/>
+    </section>
+
+    <section anchor="Sec-archtecture-of-SA46T" title="Architecture of M4P6E">
+      <t/>
+
+      <t><xref target="Fig-m4p6e-arch"/> shows M4P6E address architecture.
+      M4P6E address consists four parts, M4P6E prefix, IPv4 network plane ID,
+      IPv4 address, and Port number.</t>
+
+      <t><figure anchor="Fig-m4p6e-arch">
+          <artwork><![CDATA[
+|                      |                |                |         |
+|    80 - m bits       |   m bits       |    32 bits     | 16 bits |
++----------------------+----------------+----------------+----:----+
+|  M4P6E prefix        | IPv4 network   |  IPv4 address  |  port   |
+|                      | plane ID       |                | number  |
++----------------------+----------------+----------------+----:----+
+|<--------------- Locator (128 -n bits  )-------------------->:<-->|
+|                                                             : ID |
+|                                                            (n bits)
+
+]]></artwork>
+        </figure></t>
+
+      <t>In M4P6E, boundary of locator and identifier is in port number part,
+      that mean, M4P6E use upper part of port number as locator, and lower
+      part of port number as identifier.</t>
+    </section>
+
+    <section title="M4P6E address format">
+      <t><xref target="Fig-sa46tas-addr-fmt"/> show a example of M4P6E address
+      format. In this example, 16bits IPv4 network plane ID is used, that
+      provide 65535 IPv4 network plane.</t>
+
+      <t><figure anchor="Fig-sa46tas-addr-fmt">
+          <artwork><![CDATA[
+
+ | 3 |      45bits      |  16bits |  16 bits|   32bits   | 16 bits |
+ +---+------------------+---------+---------+------------+---------+
+ |001|  routing prefix  |subnet id| plane ID|IPv4 address| Port #  |
+ +---+------------------+---------+----------------------+---------+
+
+]]></artwork>
+        </figure></t>
+
+      <t/>
+
+      <t/>
+
+      <t/>
+    </section>
+
+    <section anchor="Sec-using-sa46tas"
+             title="Using M4P6E in client server environments">
+      <t/>
+
+      <t/>
+
+      <section title="Client environments">
+        <t><xref target="Client-example"/> shows a example of M4P6E usage in
+        client environments. In this document, NAPT is IPv4 - IPv4 Netowrk
+        address and port number translator. Coopetation with NAPT, M4P6E
+        provide IPv4 address sharing with different users.</t>
+
+        <figure anchor="Client-example">
+          <artwork><![CDATA[
+
+ +--------------+
+ |              |    +---------+  +--------+     +---------+
+ |              +----|  M4P6E  |--|  NAPT  |--+--| Clients |
+ |              |    +---------+  +--------+  |  +---------+
+ |              |                             |  +---------+
+ |              |                             +--| Clients |
+ | Backbone     |                             |  +---------+
+ |              |                             :
+ |              |                             |  +---------+
+ |   Network    |                             +--| Clients |
+ |              |                                +---------+
+ |              |
+ |              |    +---------+  +--------+     +---------+
+ |              +----|  M4P6E  |--|  NAPT  |--+--| Clients |
+ |              |    +---------+  +--------+  |  +---------+
+ |              |                             |  +---------+
+ |              |                             +--| Clients |
+ |              |                             |  +---------+
+ |              |                             :
+ |              |                             |  +---------+
+ |              |                             +--| Clients |
+ |              |                                +---------+
+ :              :        :             :              :
+ |              |    +---------+  +--------+     +---------+
+ |              +----|  M4P6E  |--|  NAPT  |--+--| Clients |
+ |              |    +---------+  +--------+  |  +---------+
+ |              |                             |  +---------+
+ |              |                             +--| Clients |
+ |              |                             |  +---------+
+ |              |                             :
+ |              |                             |  +---------+
+ |              |                             +--| Clients |
+ |              |                                +---------+
+ +--------------+
+
+]]></artwork>
+        </figure>
+
+        <t/>
+      </section>
+
+      <section title="Server environments">
+        <t><xref target="Server-example"/> shows an example of M4P6E usage in
+        server environments. In this example, server terminate M4P6E tunnel.
+        This case, Server require at least one port number per server, that
+        mean, 128bits host route advertise for server access via IPv4. This
+        case, full access is provided via IPv6.</t>
+
+        <figure anchor="Server-example">
+          <artwork><![CDATA[
+ +--------------+
+ |              |    +------------+  
+ |              +----|Server with |
+ |              |    |M4P6E       |
+ | Backbone     |    |function    |
+ |              |    +------------+
+ |              |    +------------+  
+ |  Network     +----|Server with |
+ |              |    |M4P6E       |
+ |              |    |function    |
+ |              |    +------------+
+ :              :           :
+ |              |    +------------+  
+ |              +----|Server with |
+ |              |    |M4P6E       |
+ |              |    |function    |
+ |              |    +------------+
+ +--------------+
+
+]]></artwork>
+        </figure>
+
+        <t/>
+      </section>
+
+      <section title="Data Center Environments">
+        <t><xref target="DataCenter-example"/> shows an example of M4P6E usage
+        in Data Center environments. In this example, M4P6E is used only in
+        Data Center Backend Network closely. Client which is connected via
+        backbone network does not know the exists of M4P6E. M4P6E can provide
+        at least one port number per server, this case, 128bits host route is
+        advertised, however this route in advertised only in data center
+        backbone network. Ofcource, IPv6 address may allocated to the server,
+        so full access is provided via IPv6.</t>
+
+        <t/>
+
+        <t><figure anchor="DataCenter-example">
+            <artwork><![CDATA[                             .
+ +--------+                  .        +-------+
+ |        |  +-------+       .        |       | +-----------------+
+ |        +--+       |       .        |       |-|  Server w/M4P6E |
+ |        |  | Data  |       .        | Data  | +-----------------+
+ |Backbone+--+Center |  +----------+  |Center | +-----------------+
+ |        |  |       +--|   M4P6E  |--+       |-|  Server w/M4P6E |
+ |        |  |Front  |  +----------+  |Backend| +-----------------+
+ |Network |  |Network|       .        |Network| +-----------------+
+ |        |  |       |  +----------+  |       |-|  Server w/M4P6E |
+ |        |  |       +--|   M4P6E  |--+       | +-----------------+
+ |        |  |       |  +----------+  |       | +-----------------+
+ :        :  :       :       .        |       |-|  Server w/M4P6E |
+ |        |  |       |       .        |       | +-----------------+
+ |        |  |       |       .        |       |         :
+ |        |  |       |       .        |       | +-----------------+
+ |        |  |       |       .        |       |-|  Server w/M4P6E |
+ |        |  +-------+       .        |       | +-----------------+
+ +--------+                  .        +-------+
+                             .
+ -Normal IPv4 communication->.<----- M4P6E ----->
+                             .     communication
+                             .
+ ------- Normal IPv6 communication ----------------->
+                             .
+
+]]></artwork>
+          </figure></t>
+      </section>
+    </section>
+
+    <section title="Port Number Issue">
+      <t>M4P6E require port number of transport layer. M4P6E can not support
+      <xref target="RFC0792">ICMPv4</xref>. The function provided by ICMPv4
+      does not work in M4P6E environments, such as <xref target="RFC1191">Path
+      MTU Discovery</xref>, ping command, etc.</t>
+
+      <t>M4P6E can not also support IPv4 IPsec <xref
+      target="RFC4303">ESP</xref> because transport header is encrypted.</t>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document makes no request of IANA.</t>
+
+      <t>Note to RFC Editor: this section may be removed on publication as an
+      RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>M4P6E use automatic tunneling technologies. Security consideration
+      related tunneling technologies are discussed in <xref
+      target="RFC2893">RFC2893</xref>, <xref target="RFC2267">RFC2267</xref>,
+      etc.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+    </references>
+
+    <references>
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2893.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.1631.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.1191.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.0792.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2267.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.4303.xml'?>
+    </references>
+  </back>
+</rfc>
