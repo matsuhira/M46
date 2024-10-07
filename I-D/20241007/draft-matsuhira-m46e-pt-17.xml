@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-matsuhira-m46e-pt-17" ipr="trust200902">
+  <front>
+    <title abbrev="M46E-PT">Multiple IPv4 - IPv6 address mapping encapsulation
+    - prefix translator (M46E-PT)</title>
+
+    <author fullname="Naoki Matsuhira" initials="N." surname="Matsuhira">
+      <organization>Neptela</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <code/>
+
+          <region/>
+
+          <country>Japan</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>matsuhira.ietf@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="7" month="October" year="2024"/>
+
+    <area/>
+
+    <workgroup/>
+
+    <keyword>IPv6</keyword>
+
+    <keyword>IPv4</keyword>
+
+    <abstract>
+      <t>This document specifies Multiple IPv4 - IPv6 mapping encapsulation -
+      Prefix Translator (M46E-PT) specification. M46E-PT expand IPv4 network
+      plane by connecting M46E-FP domain and M46E-PR domain. M46E-PT translate
+      prefix part of M46E-FP address and M46E-PR address both are IPv6
+      address. M46E-PT does not translate IPv4 packet which is encapsulated,
+      so transparency of IPv4 packet is not broken.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>This document provide M46E Prefix Translator (M46E-PT)
+      specification.</t>
+
+      <t>The basic strategy for IPv6 deployment is dual stack. However,
+      because of exhaustion of IPv4 address, there will be no IPv4 addresses
+      for configuring dual stack in near future. That means there will be IPv6
+      only networks automatically.</t>
+
+      <t>However, there are many IPv4 only networks still exist and those
+      seems continuous use in near future. That means methods continuous use
+      of IPv4 network over IPv6 only network will be required.</t>
+
+      <t><xref target="I-D.draft-matsuhira-m46e-fp">M46E-FP</xref> provide
+      such methods. In addition, <xref
+      target="I-D.draft-matsuhira-m46e-pr">M46E-PR</xref> also provide such
+      methots. M46E-FP is backbone network based approach, on the other hand,
+      M46E-PR is stub network based approach.</t>
+
+      <t>M46E-PT expand IPv4 network plane by connecting M46E-FP domain and
+      M46E-PR domain. M46E-PT translate prefix part of M46E-FP address and
+      M46E-PR address both are IPv6 address. M46E-PT does not translate IPv4
+      packet which is encapsulated, so transparency of IPv4 packet is not
+      broken.</t>
+
+      <t/>
+    </section>
+
+    <section title="Basic Network Configuration">
+      <t><xref target="Fig-network-configuration"/> shows network
+      configuration with M46E-PT. At large view, the network consists three
+      parts, M46E-FP domain, M46E-PR domain, and M46E-PT. M46E-PT connect
+      M46E-FP domain and M46E-PR domain.</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-network-configuration">
+          <artwork><![CDATA[
+ <------ M46E-FP Domain ------------> <--------- M46E-PR Domain ---->
+
+ /-------------------------------/   /-----------------------------\
+ |                               |   |                             |
+ |    Backbone Network         +----------+   Backbone Network     |
+ |                             | M46E-PT  |                        |
+ |                             +----------+                        |
+ |   +----------+  +----------+  |   |                             |
+ \---| M46E-FP  |--| M46E-FP  |--/   /-----------------------------/
+     +----------+  +----------+           |                |
+           |           |                  |                |
+           |           |                  |                |
+           |           |              +----------+    +----------+     
+ /--------------\/--------------/   /-| M46E-PR  |-\/-| M46E-PR  |-\ 
+ |              ||              |   | +----------+ || +----------+ |   
+ |              ||              |   |              ||              |   
+ | Stub Network || Stub Network |   | Stub Network || Stub Network |   
+ |              ||              |   | (IPv4 only)  || (Dual Stack) |   
+ |              ||              |   |              ||              |   
+ \--------------//--------------/   \--------------/\--------------/   
+
+
+]]></artwork>
+        </figure></t>
+
+      <t/>
+
+      <t>M46E-FP domain consists three parts, backbone network, stub network
+      and M46E-FP. Backbone network can be operated with IPv6 only. Stub
+      network has three cases, IPv4 only, Dual Stack (both IPv4 and IPv6), and
+      IPv6 only.M46E-FP connects backbone network and stub network in case
+      IPv4 still works in that stub network. If stub network is IPv6 only,
+      M46E-FP is not needed. M46E-FP is a backbone network based approach,
+      that mean M46E-FP advertise special route for M46E-FP.</t>
+
+      <t/>
+
+      <t>And also, M46E-PR domain consists three parts, backbone network, stub
+      network and M46E-FP. Backbone network can be operated with IPv6 only.
+      Stub network has three cases, IPv4 only, Dual Stack (both IPv4 and
+      IPv6), and IPv6 only.M46E-FP connects backbone network and stub network
+      in case IPv4 still works in that stub network. If stub network is IPv6
+      only, M46E-PR is not needed. M46E-PR is a stub network based
+      approach.</t>
+    </section>
+
+    <section title="Basic function of M46E-PT">
+      <t>This section describe basic function of M46E-PT.</t>
+
+      <section title="Translation processing">
+        <t>M46E-PT translate between M46E-FP packet and M46E-PT packet.
+        M46E-FP packet and M46E-PT packet are almost the same, however IPv6
+        address are different.</t>
+
+        <t>Fig shows packet format of M46E-FP domain and M46E-PT domain.</t>
+
+        <figure anchor="Fig-sa46tpt-func">
+          <artwork><![CDATA[
++--------+--------+------------+       +--------+--------+------------+
+|IPv6 Hdr|IPv4 Hdr|    Data    |  -->  |IPv6 Hdr|IPv4 Hdr|    Data    |
++--------+--------+------------+       +--------+--------+------------+
+
++--------+--------+------------+       +--------+--------+------------+
+|IPv6 Hdr|IPv4 Hdr|    Data    |  <--  |IPv6 Hdr|IPv4 Hdr|    Data    |
++--------+--------+------------+       +--------+--------+------------+
+
+
+    /-------------------\  +----------+  /---------------------------\
+    |   M46E-FP Domain  |--| M46E-PT  |--|      M46E-PR Domain       |
+    |                   |  +----------+  |                           |
+    \-------------------/                \---------------------------/
+
+]]></artwork>
+        </figure>
+
+        <t/>
+      </section>
+
+      <section title="M46A architecture">
+        <t/>
+
+        <t>M46E-FP and M46E-PR use <xref
+        target="I-D.draft-matsuhira-m46a">M46A</xref>.</t>
+
+        <t>figure <xref target="Fig-M46A-arch"/> shows M46A architecture.</t>
+
+        <t><figure anchor="Fig-M46A-arch">
+            <artwork><![CDATA[
+    |    96 - m bits           |          m bits        |     32 bits  |
+    +--------------------------+------------------------+--------------+
+    |        M46A prefix       | IPv4 network plane ID  | IPv4 address |
+    +--------------------------+------------------------+--------------+
+]]></artwork>
+          </figure></t>
+
+        <t/>
+      </section>
+
+      <section title="Resolving translate prefix">
+        <t/>
+
+        <t>M46E-PT translate from M46E-FP prefix to M46E-PR prefix, or from
+        M46E-PR prefix to M46E-FP prefix using M46E-FP Prefix Translation
+        (M46E-PT) table. fig <xref target="Fig-addr-resolve"/>shows address
+        resolution manner and fig <xref target="Fig-sa46t-pr-tab"/>shows
+        M46E-PT table.</t>
+
+        <t><figure anchor="Fig-addr-resolve">
+            <artwork><![CDATA[    |        96 - m bits       |         m bits         |     32 bits  |
+    +--------------------------+------------------------+--------------+
+    |        M46A prefix       | IPv4 network plane ID  | IPv4 address |
+    +--------------------------+------------------------+--------------+
+
+    \--------------------------/\--------------------------------------/
+               ^                                     |
+               |                                     |
+               |                                     v
+    +------------------------------------------------------------------+
+    |                                                                  |
+    |       M46E-FP Prefix Translation Table (M46E-PT Table)           |
+    |                                                                  |
+    +------------------------------------------------------------------+
+]]></artwork>
+          </figure></t>
+
+        <t>M46E-FP-AT table is similar with M46E-PR table, however M46E-AT
+        table may contain M46E-FP prefix.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-sa46t-pr-tab">
+            <artwork><![CDATA[   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            |
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+                 :              :               :
+   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46A prefix            | 
+   +---------------------+------------+-------++-----------------------+
+]]></artwork>
+          </figure></t>
+
+        <t/>
+      </section>
+
+      <section title="Destination address resolution">
+        <t>For address resolution for destination address, M46E-PT use M46E-PT
+        table.</t>
+
+        <t/>
+
+        <t/>
+      </section>
+
+      <section title="Source address resolution">
+        <t>For address resolution for source address, M46E-PT use interface
+        information, not M46E-PT table. From M46E-FP domain to M46E-PR domain,
+        M46E-PT use IPv6 address prefix of the interface which belong M46E-PR
+        domain. From</t>
+
+        <t/>
+
+        <t/>
+      </section>
+    </section>
+
+    <section title="Sample Configuration">
+      <t/>
+
+      <t/>
+
+      <t>Figure <xref target="Fig-sample-network"/>shows sample confiuration
+      of M46E-PT. In this example, there are four IPv4 stub network with the
+      same IPv4 network plane, and two of four are in M46E-FP domain and other
+      two of four are in M46E-PR domain.</t>
+
+      <t>In this example, M46E-FP prefix is 2001:0db8:0:46::/64.</t>
+
+      <t/>
+
+      <figure anchor="Fig-sample-network">
+        <artwork><![CDATA[ /------------\
+ |           +--------+  /----------------------\
+ | Backbone  |        |  |Stub Network#1        |
+ | Network   |M46E-FP |--|10.1.1.0/24(plane 1)  |
+ |(IPv6 only)|        |  |2001:0db8:1:1::/64    |
+ |           +--------+  \----------------------/
+ |       <--[2001:0db8:1:1::/64]
+ |       <--[2001:0db8:0:46:0:1:10.1.1.0/120]
+ |            |
+ |           +--------+  /----------------------\
+ |           |        |  |Stub Network#2        |
+ |           |M46E-FP |--|10.1.2.0/24(plane 1)  |
+ |           |        |  |2001:0db8:1:2::/64    |
+ |           +--------+  \----------------------/
+ |       <--[2001:0db8:1:2::/64]
+ |       <--[2001:0db8:0:46:0:1:10.1.2.0/120]
+ |            |
+ |       <--[2001:0db8:0:46:0:1:10.1.4.0/120]
+ |       <--[2001:0db8:0:46:0:1:10.1.5.0/120]
+ |           +------------+
+ |           | M46E-PT   |
+ |           +------------+
+ \------------/    |
+       |           |Stub Network #0
+ /------------\    | 2001:0db8:2:0::/64
+ |            |----+
+ |            |  /--------------------------------------/
+ |            |  | Stub Network #3                      |
+ |            |  |  2001:0db8:2:1::/64                  |
+ |            |  | +--------+  /----------------------\ |
+ |            |--| |M46E-PR |--|10.1.3.0/24(plane 1)  | |
+ |            |  | +--------+  /----------------------/ |
+ |           <--[2001:0db8:2:1::/64]                    |
+ |            |  /--------------------------------------/
+ |            |
+ |            |  /--------------------------------------/
+ |            |  | Stub Network #4                      |
+ |            |  |  2001:0db8:2:2::/64                  |
+ | Backbone   |  | +--------+  /----------------------\ |
+ | Network    |--| |M46E-PR |--|10.1.4.0/24(plane 1)  | |
+ |            |  | +--------+  \----------------------/ |
+ |           <--[2001:0db8:2:2::/64]                    |
+ |            |  /--------------------------------------/
+ \------------/
+
+]]></artwork>
+      </figure>
+
+      <t/>
+
+      <t>Figure <xref target="Fig-sample-sa46tpt-table"/> shows M46E-PT table
+      for this example. This example is default free case.</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-sample-sa46tpt-table">
+          <artwork><![CDATA[   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46E-PR address prefix |
+   +---------------------+------------+-------++-----------------------+
+   |        1            | 10.1.1.0   | /120  || 2001:0db8:0:46        |
+   |        1            | 10.1.2.0   | /120  || 2001:0db8:0:46        |
+   |        1            | 10.1.3.0   | /120  || 2001:0db8:2:1         |
+   |        1            | 10.1.4.0   | /120  || 2001:0db8:2:2         |
+   +---------------------+------------+-------++-----------------------+
+]]></artwork>
+        </figure></t>
+
+      <t/>
+
+      <t>Fig <xref target="Fig-sample-sa46tpt-table-default"/>shows another
+      M46E-PT table for this example. This example use default for M46E-FP. If
+      there are many stub network in M46E-FP domain, by using default as
+      M46E-FP prefix, reduction of M46E-PT table size can be possible.</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-sample-sa46tpt-table-default">
+          <artwork><![CDATA[   +---------------------+------------+-------++-----------------------+
+   |IPv4 network plane ID|IPv4 address|netmask||M46E-PR address prefix |
+   +---------------------+------------+-------++-----------------------+
+   |        1            | 10.1.3.0   | /120  || 2001:0db8:2:1         |
+   |        1            | 10.1.4.0   | /120  || 2001:0db8:2:2         |
+   |        1            |  0.0.0.0   | /0    || 2001:0db8:0:46        |
+   +---------------------+------------+-------++-----------------------+
+]]></artwork>
+        </figure></t>
+
+      <t/>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document makes no request of IANA.</t>
+
+      <t>Note to RFC Editor: this section may be removed on publication as an
+      RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Security Considerations does not discussed in this memo.</t>
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t/>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+
+      <reference anchor="I-D.draft-matsuhira-m46a">
+        <front>
+          <title>Multiple IPv4 - IPv6 mapped IPv6 address</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization/>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+
+      <reference anchor="I-D.draft-matsuhira-m46e-fp">
+        <front>
+          <title>Multiple IPv4 - IPv6 address mapping encapsulation - fixed
+          prefix (M46E-FP)</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization/>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+
+      <reference anchor="I-D.draft-matsuhira-m46e-pr">
+        <front>
+          <title>Multiple IPv4 - IPv6 address mapping encapsulation - prefix
+          resolution</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization/>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+    </references>
+  </back>
+</rfc>
