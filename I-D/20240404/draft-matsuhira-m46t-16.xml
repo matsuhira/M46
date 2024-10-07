@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-matsuhira-m46t-16" ipr="trust200902">
+  <front>
+    <title abbrev="M46T">Multiple IPv4 - IPv6 address mapping translator
+    (M46T)</title>
+
+    <author fullname="Naoki Matsuhira" initials="N." surname="Matsuhira">
+      <organization>Neptela</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <code/>
+
+          <region/>
+
+          <country>Japan</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>matsuhira.ietf@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="4" month="April" year="2024"/>
+
+    <area>Transport Area</area>
+
+    <workgroup/>
+
+    <keyword>IPv6</keyword>
+
+    <keyword>Draft</keyword>
+
+    <abstract>
+      <t>This document specifies Multiple IPv4 - IPv6 address mapping
+      Translator (M46T) specification. M46T enable access to IPv4 only host
+      from IPv6 host. IPv4 host is identified as M46 address in IPv6 address
+      space. The address assigned to IPv4 host may be global IPv4 address or
+      private IPv4 address. M46T does not support access to IPv6 host from
+      IPv4 only host.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>This document specifies Multiple IPv4 - IPv6 address mapping
+      Translator (M46T) specification. M46T enable access to IPv4 only host
+      from IPv6 host. IPv4 host is identified as M46 address in IPv6 address
+      space. The address assigned to IPv4 host may be global IPv4 address or
+      private IPv4 address. M46T does not support access to IPv6 host from
+      IPv4 only host.</t>
+
+      <t/>
+    </section>
+
+    <section title="M46T Architecture">
+      <t/>
+
+      <section title="M46 address">
+        <t><xref target="Fig-sa46t-addr"/> show <xref
+        target="I-D.draft-matsuhira-m46a">M46A</xref>.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-sa46t-addr">
+            <artwork><![CDATA[
+ |     96 - m bits       |          m bits          |     32 bits  |
+ +-----------------------+--------------------------+--------------+
+ |     M46A prefix       |  IPv4 network plane ID   | IPv4 address |
+ +-----------------------+--------------------------+--------------+
+
+]]></artwork>
+          </figure></t>
+      </section>
+
+      <section title="Mapping IPv4 address and IPv6 address">
+        <t>M46A contain IPv4 address. Mapping IPv4 host address to IPv6
+        address space is already done with M46A. Address translation for IPv4
+        address is same as resolving M46A.</t>
+
+        <t>IPv6 host address and corresponding IPv4 address should manage.</t>
+
+        <t/>
+      </section>
+
+      <section title="Address Translation Table">
+        <t/>
+
+        <t><xref target="Fig-translate-table"/> shows translation table for
+        M46T. Translation table contain three value, IPv6 adddress ot IPv6
+        host, mapped IPv4 address for the IPv6 host, and extry expire timer
+        for remove the entry.</t>
+
+        <t><figure anchor="Fig-translate-table">
+            <artwork><![CDATA[
+ +----------------------+----------------------+--------------------+
+ | Address of IPv6 host | mapped IPv4 address  | entry expire timer | 
+ |                      | for IPv6 host        |                    |  
+ +----------------------+----------------------+--------------------+
+ |         :            |          :           |         :          |
+ ~         :            ~          :           ~         :          ~
+ |         :            |          :           |         :          |
+ +----------------------+----------------------+--------------------+
+ | Address of IPv6 host | mapped IPv4 address  | entry expire timer | 
+ |                      | for IPv6 host        |                    |  
+ +----------------------+----------------------+--------------------+
+
+]]></artwork>
+          </figure></t>
+      </section>
+
+      <section title="DNS mapping of IPv4 only host">
+        <t>In the Domain Name System, hostnames are mapped to IPv6 addresses
+        by AAAA resource records. M46 address can be mapped to IPv4 only host
+        name.</t>
+
+        <t/>
+      </section>
+    </section>
+
+    <section title="Sample Configuration">
+      <t/>
+
+      <section title="M46 address and IPv4 network plane ID">
+        <t>In this example, M46A prefix length is 64bits, and IPv4 network
+        plane ID length is 32 bits. M46A prefix value is 2001:0DB8:0:46, and
+        IPv4 network plane ID value is 0:46. <xref target="Fig-sample-addr"/>
+        shows these value.</t>
+
+        <t><figure anchor="Fig-sample-addr">
+            <artwork><![CDATA[
+ |     64  bits          |          32 bits         |     32 bits  |
+ +-----------------------+--------------------------+--------------+
+ | M46A prefix           |  IPv4 network plane ID   | IPv4 address |
+ | (2001:0DB8:0:46)      | (0:46)                   |              |
+ +-----------------------+--------------------------+--------------+
+]]></artwork>
+          </figure></t>
+      </section>
+
+      <section title="Network Configuration">
+        <t><xref target="Fig-network-config"> </xref> shows sample network
+        configuration. IPv6 network have 2001:0DB8:1:0/64 network prefix and
+        IPv4 network have 10.0.0.0/24 network prefix.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-network-config">
+            <artwork><![CDATA[
+  +----------------+
+  |  IPv6 host     |
+  |          2001:0DB8:1.0::10
+  +----------------+
+         |
+         | 2001:0DB8:1:0/64
+         |
+  +----------------+
+  |      2001:0DB8:1:0::1
+  |                |
+  |    M46T        |
+  |           address pool for IPv6 host mapping
+  |              192.168.0.0/24
+  |                |
+  |           10.0.0.1
+  +----------------+
+         |
+         | 10.0.0.0/24
+         |
+  +----------------+
+  | IPv4 only host |
+  |                |
+  |     ipv4onlyhost10.example.com
+  |     10.0.0.10  |
+  |     (2001:0DB8:0:46:0:64:10.0.0.10)
+  |                |
+  +----------------+
+
+
+
+]]></artwork>
+          </figure>IPv6 host address is 2001:0DB8:1:0::10. IPv4 only host
+        address is 10.0.0.10. M46 address for IPv4 only host is
+        2001:0DB8:0:46:0:64:10.0.0.10. FQDN of IPv4 only host is
+        ipv6onlyhost10.example.com. <xref target="Fig-v4-dns-entry"/> shows
+        DNS entry in IPv4 address space, and <xref target="Fig-v6-dns-entry"/>
+        shows DNS entry in IPv6 space.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-v4-dns-entry">
+            <artwork><![CDATA[
+ipv6onlyhost10.example.com IN A 10.0.0.10
+
+]]></artwork>
+          </figure></t>
+
+        <t><figure anchor="Fig-v6-dns-entry">
+            <artwork><![CDATA[
+ipv6onlyhost10.example.com IN AAAA 2001:0DB8:0:46:0:64:10.0.0.10
+
+]]></artwork>
+          </figure></t>
+
+        <t>The address of IPv4 interface of M46T is 10.0.0.1, and the address
+        of IPv6 interface of M46T is 2001:0DB8:1:0::1. M46T have also IPv4
+        address pool for IPv6 host mapping. This example, the IPv4 address
+        pool is 192.168.0.0/24.</t>
+
+        <t>The default router for IPv4 only host is M46T's IPv4 interface
+        address, 10.0.0.1.</t>
+
+        <t/>
+      </section>
+
+      <section title="Routing">
+        <t>If using M46T in own routing domain, M46T advertise M46 address
+        prefix for IPv4 only host, 2001:0DB8:0:46:0:64:10.0.0.0/120.</t>
+      </section>
+    </section>
+
+    <section title="Processing of M46T">
+      <t/>
+
+      <section title="Configuration of M46T">
+        <t><list style="numbers">
+            <t>M46A prefix for route advertisement
+            (2001:0DB8:0:46:0:64:10.0.0.0/120)</t>
+
+            <t>IPv4 address pool for IPv6 hosts</t>
+
+            <t>entry expire default time (TBD)</t>
+          </list>M46A contain IPv4 network plane ID, so M46T know IPv4 network
+        plane ID from M46A prefix.</t>
+
+        <t/>
+      </section>
+
+      <section title="Processing from IPv6 to IPv4">
+        <t><list style="numbers">
+            <t>M46T examine the exists of the entry for IPv6 host, that is
+            source IPv6 address of IPv6 packet.</t>
+
+            <t>If there is no entry, get IPv4 address for mapping of IPv6 host
+            from IPv4 address pool, and make entry to the translation
+            table.</t>
+
+            <t>IF there is the entry, resove mapped IPv4 address for IPv6
+            host.</t>
+
+            <t>Make IPv4 header, source address is mapped IPv4 address, and
+            destination address is from M46 address.</t>
+
+            <t>Translate IPv6 packet to IPv4 packet, and send it, and reset
+            entry expire timer.</t>
+          </list>The example addess translation table is shown in <xref
+        target="Fig-example-addr-trans-tab"/>. In this example, IPv6 host
+        address is mapped to 192.168.0.200.</t>
+
+        <t><figure anchor="Fig-example-addr-trans-tab">
+            <artwork><![CDATA[
+ +----------------------+----------------------+--------------------+
+ | Address of IPv6 host | mapped IPv4 address  | entry expire timer | 
+ |                      | for IPv6 host        |                    |  
+ +----------------------+----------------------+--------------------+
+ | 2001:0DB8:1.0::10    | 192.168.0.200        | TBD                | 
+ +----------------------+----------------------+--------------------+
+
+
+
+]]></artwork>
+          </figure></t>
+      </section>
+
+      <section title="Processing from IPv6 to IPv4">
+        <t><list style="numbers">
+            <t>Search address translation table with key destination IPv4
+            address, and resolve corrensponding IPv6 address.</t>
+
+            <t>Resolve source IPv6 address from sourve IPv4 address with M46
+            address generation rule.</t>
+
+            <t>Translate IPv4 packet to IPv6 packet, and sent it, and reset
+            extry expire timer.</t>
+          </list></t>
+      </section>
+
+      <section title="Other processing">
+        <t><list style="numbers">
+            <t>Remove the entry of address translation table if expire.</t>
+          </list></t>
+      </section>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document may requests IANA to assign IPv6 prefix for M46 Global
+      address.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Security consideration does not discussed in this memo, at this
+      time.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+
+      <reference anchor="I-D.draft-matsuhira-m46a">
+        <front>
+          <title>Multiple IPv4 - IPv6 mapped IPv6 address</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization/>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+
+      <?rfc ?>
+
+      <?rfc ?>
+    </references>
+  </back>
+</rfc>

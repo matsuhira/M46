@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-matsuhira-m46e-fp-16" ipr="trust200902">
+  <front>
+    <title abbrev="M46E-FP">Multiple IPv4 - IPv6 address mapping encapsulation
+    - fixed prefix (M46E-FP)</title>
+
+    <author fullname="Naoki Matsuhira" initials="N." surname="Matsuhira">
+      <organization>Neptela</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <code/>
+
+          <region/>
+
+          <country>Japan</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>matsuhira.ietf@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="4" month="April" year="2024"/>
+
+    <area/>
+
+    <workgroup/>
+
+    <keyword>IPv6</keyword>
+
+    <keyword>Draft</keyword>
+
+    <abstract>
+      <t>This document specifies Multiple IPv4 - IPv6 address mapping
+      encapsulation - fixed prefix (M46E-FP) specification. M46E-FP makes
+      backbone network to IPv6 only. And also, M46E-FP can stack many IPv4
+      networks, i.e. the networks using same IPv4 (private) addresses, without
+      interdependence.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section anchor="Sec-Introduction" title="Introduction">
+      <t>This document provides Multiple IPv4 - IPv6 address maping
+      encapsulation - fixed prefix (M46E-FP) specification.</t>
+
+      <t>The basic strategy for IPv6 deployment is dual stack. Viewing this
+      strategy from operational side, operation cost of dual stack is higher
+      than single stack operation. Viewing from future, IPv6 only operation is
+      more reasonable rather than IPv4 only operation. Therefore IPv6 only
+      operation is desired.</t>
+
+      <t>M46E-FP makes backbone network to IPv6 only and privide IPv4
+      connectivities. And also, M46E-FP can stack many IPv4 networks, i.e. the
+      networks using same IPv4 (private) address, without interdependence.</t>
+
+      <t/>
+    </section>
+
+    <section anchor="Sec-archtecture-of-M46E-FP"
+             title="Architecture of M46E-FP">
+      <t/>
+
+      <t>IP address contain two information, one is locator information, and
+      another is identifier information. This is basic architecture of
+      internet protocol, and also the Internet, and no difference between IPv4
+      and IPv6.</t>
+
+      <t/>
+
+      <t>Locater is a information related "Where", and indentifier is a
+      information related "Who". That mean, IP address's semantics is "Where's
+      Who" meaning. Host is identified whole IP address information, that is
+      "Where's Who", however route to the host is identified just locator
+      information in IP address, that is "Where". See <xref
+      target="Fig-ipaddr-arch"/>.</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-ipaddr-arch">
+          <artwork><![CDATA[
+     |<------ IP address ------------------>|
+     |<----- Locator ----->|<--Identifier-->| 
+            (Where )             (Who)
+     +---------------------+----------------+
+     |                     |                |
+     +---------------------+----------------+
+
+]]></artwork>
+        </figure></t>
+
+      <t>In IPv4 address space, some host has IPv4 address, which consist n
+      bits length identifier and 32 - n bits locator. In Where's Who
+      representation, 32 - n bits "Where" and n bits "Who".</t>
+
+      <t/>
+
+      <t>Keeping such "Where's Who" relation, IPv4 address can be represent as
+      IPv6 address by expanding "Where" information from 32 - n bits to 128 -
+      n bits. Expanding " Where" information, IPv4 address can be mapped to
+      IPv6 address. <xref target="Fig-ipaddr-expanding"> </xref> shows such
+      expanding.</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-ipaddr-expanding">
+          <artwork><![CDATA[
+
+ |<------------------------ 128 bits ----------------------------->|
+ |<-------------------- 96 bits ------------------->|<-- 32 bits ->|
+ |                                                          :      |
+ |                                                          :      |
+ |                                                  +-------:------+
+ |                                                  | IPv4 address |
+ |                                                  +-------:------+
+ |                                                  |<-Loc->:<-ID->|
+ |                                                  | 32-n  :  n   |
+ |                                                  | bits  : bits |
+ |                                                  |       :      |  
+ +--------------------------------------------------+-------:------+
+ |       M46A prefix (no IPv4 network plane ID)     | IPv4 address |
+ +--------------------------------------------------+-------:------+
+ |                                                          :      |
+ |<------------- Locator (128 - n bits ) ------------------>:<-ID->|
+ |                                                          :  n   |
+ |                                                          : bits |
+
+]]></artwork>
+        </figure></t>
+
+      <t>IPv4 address space contain private address, that is non globally
+      unique IP address. If some identifier which distinguish private address
+      can introduce in IPv6 address space, we can treate IPv4 private address
+      as different address in IPv6 address space. This document define such
+      identifier as "IPv4 network plane ID". "IPv6 network plane ID" can
+      provide VPN (Virtual Private Network) like service.</t>
+
+      <t/>
+
+      <t>That is M46A. In M46E-FP address, "Where" information's bit length is
+      128 -n bits, and "Who" information's bit length is n bits. <xref
+      target="Fig-sa46t-arch-summary"> </xref> shows summary of IPv4 address
+      and M46E-FP address relation.</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-sa46t-arch-summary">
+          <artwork><![CDATA[
+ |<------------------------ 128 bits ----------------------------->|
+ |<-------------------- 96 bits ------------------->|<-- 32 bits ->|
+ |                                                          :      |
+ |                                                          :      |
+ |                                                  +-------:------+
+ |                                                  | IPv4 address |
+ |                                                  +-------:------+
+ |                                                  |<-Loc->:<-ID->|
+ |                                                  | 32-n  :  n   |
+ |                                                  | bits  : bits |
+ |                                                  |       :      |
+ +--------------------------------------------------+-------:------+
+ |       M46A prefix (no IPv4 network plane ID)     | IPv4 address |
+ +--------------------------------------------------+-------:------+
+ |                                                          :      |
+ |                                                          :      |
+ |    96 - m bits        |          m bits          |     32 bits  |
+ +-----------------------+--------------------------+-------:------+
+ |      M46A prefix      |  IPv4 network plane ID   | IPv4 address |
+ +-----------------------+--------------------------+-------:------+
+ |<------------- Locator (128 - n bits ) ------------------>:<-ID->|
+ |                                                          :  n   |
+ |                                                          : bits |
+
+]]></artwork>
+        </figure></t>
+
+      <t/>
+
+      <t/>
+    </section>
+
+    <section title="Basic Network Configuration">
+      <t><xref target="Fig-network"/> shows network configuration with
+      M46E-FP. The network consists of three parts. Backbone network, stub
+      network, and M46E-FP.</t>
+
+      <t>Backbone network is operated with IPv6 only. Stub network has three
+      cases. IPv4 only, Dual Stack (both IPv4 and IPv6), and IPv6 only.</t>
+
+      <t>M46E-FP connects backbone network and stub network in case IPv4 still
+      works in that stub network. If stub network is IPv6 only, M46E-FP is not
+      needed.</t>
+
+      <t>Campus network, corporate network, ISP and datacenter network are the
+      example for such network.</t>
+
+      <t><figure anchor="Fig-network">
+          <artwork><![CDATA[ /---------------------------------------------------\
+ |                                                   |
+ |                  Backbone Network                 |
+ |                    (IPv6 only)                    |
+ |                                                   |
+ \---------------------------------------------------/
+       |                    |                |
+   +-------+            +-------+            |
+   |M46E-FP|            |M46E-FP|            |
+   +-------+            +-------+            |
+       |                    |                |
+ /--------------\   /--------------\   /--------------\   
+ |              |   |              |   |              |
+ | Stub Network |   | Stub Network |   | Stub Network |
+ | (IPv4 only)  |   | (Dual Stack) |   | (IPv6 only)  |
+ |              |   |              |   |              |
+ \--------------/   \--------------/   \--------------/
+]]></artwork>
+        </figure></t>
+
+      <t/>
+    </section>
+
+    <section title="Basic Function of M46E-FP">
+      <t>M46E-FP has mainly two function. One is IPv4 over IPv6 Encapsulation
+      / Decapsulation, and another is advertise route for stub network.</t>
+
+      <t/>
+
+      <section title="IPv4 over IPv6 Encapsulation / Decapsulation">
+        <t/>
+
+        <t>M46E-FP encapsulates IPv4 packet to IPv6 from stub network to
+        backbone network, and decapsulates IPv6 packet to IPv4 from backbone
+        network to stub network. <xref target="Fig-46tun"/> shows such
+        movement.</t>
+
+        <t><figure anchor="Fig-46tun">
+            <artwork><![CDATA[
+  +--------+------------+       +----------+--------+------------+
+  |IPv4 Hdr|    Data    |  -->  | IPv6 Hdr |IPv4 Hdr|    Data    |
+  +--------+------------+       +----------+--------+------------+
+
+  +--------+------------+       +----------+--------+------------+
+  |IPv4 Hdr|    Data    |  <--  | IPv6 Hdr |IPv4 Hdr|    Data    |
+  +--------+------------+       +----------+--------+------------+
+
+
+ /-------------------\  +-------+  /-----------------------------\
+ |   Stub Network    |--|M46E-FP|--|       Backbone Network      |
+ |      (IPv4)       |  +-------+  |         (IPv6 only)         |
+ \-------------------/             \-----------------------------/
+]]></artwork>
+          </figure></t>
+
+        <t>M46E-FP MUST support <xref target="RFC1853">tunnel MTU
+        discovery</xref>. When encapsulated IPv6 Packet size exceed path MTU
+        and inner IPv4 packet have the Don't Fragment bit is set, M46E-FP MUST
+        return ICMP Destination unreachable message with Type3 Code4, <xref
+        target="RFC0792">fragmentation needed and DS set</xref>.</t>
+
+        <t/>
+
+        <t>In case IPv6, M46E-FP just relays IPv6 packet.</t>
+
+        <t><figure anchor="Fig-6relay">
+            <artwork><![CDATA[
+  +----------+------------+       +----------+------------+
+  | IPv6 Hdr |    data    |  -->  | IPv6 Hdr |    data    |
+  +----------+------------+       +----------+------------+
+
+  +----------+------------+       +----------+------------+
+  | IPv6 Hdr |    data    |  <--  | IPv6 Hdr |    data    |
+  +----------+------------+       +----------+------------+
+
+
+ /---------------------\  +-------+  /--------------------\
+ |    Stub Network     |--|M46E-FP|--|  Backbone Network  |
+ |        (IPv6)       |  +-------+  |   (IPv6 only)      |
+ \--------------------/             \---------------------/
+]]></artwork>
+          </figure></t>
+
+        <t>By IPv4 over IPv6 function, M46E-FP make backbone network to IPv6
+        only.</t>
+
+        <t/>
+      </section>
+
+      <section title="M46A architecture">
+        <t>M46A is a IPv6 address used in outer IPv6 header which encapsulate
+        IPv4 packet by M46E-FP. M46A is described in <xref
+        target="I-D.draft-matsuhira-m46a">M46A</xref>.</t>
+
+        <t><xref target="Fig-M46E-FPaddr-arch"/> shows M46A address
+        architecture</t>
+
+        <t><figure anchor="Fig-M46E-FPaddr-arch">
+            <artwork><![CDATA[
+ |      96 - m bits      |          m bits          |     32 bits  |
+ +-----------------------+--------------------------+--------------+
+ |      M46A  prefix     |  IPv4 network plane ID   | IPv4 address |
+ +-----------------------+--------------------------+--------------+
+]]></artwork>
+          </figure></t>
+
+        <t>M46A consists of three parts as follows.</t>
+
+        <t><list style="hanging">
+            <t hangText="M46A prefix"><vspace blankLines="1"/>M46A prefix.
+            This value is fixed value and preconfigured to all M46E-FP in the
+            networks.</t>
+
+            <t hangText="IPv4 network plane ID"><vspace blankLines="1"/>IPv4
+            network plane ID is an identifier of IPv4 network stack over IPv6
+            backbone network. This value is preconfigured depend on the
+            M46E-FP belong which IPv4 network plane. For more detail see <xref
+            target="Sec-stackingv4net"/>.</t>
+
+            <t hangText="IPv4 address"><vspace blankLines="1"/>IPv4 address in
+            inner IPv4 packet.</t>
+          </list></t>
+
+        <t>M46A is resolved copying IPv4 address in inner IPv4 packet, and
+        preconfigured values, M46A prefix and IPv4 network plane ID.</t>
+      </section>
+
+      <section title="Route Advertisement">
+        <t/>
+
+        <t>M46E-FP converts stub network's IPv4 route to M46E-FP IPv6 route
+        and advertises to backbone network. And reverse direction, M46E-FP
+        converts M46E-FP IPv6 route to IPv4 route, that advertises other IPv4
+        stub networks.</t>
+
+        <t>The IPv4 route for stub network is map to M46E-FP IPv6 route one to
+        one, so number of route of IPv4 is same as number of route of M46E-FP
+        IPv6 route. Total number of route is same as when backbone network
+        operate dual stack, without M46E-FP.</t>
+
+        <t/>
+
+        <t>In stub network, usual dynamic routing protocol for IPv4 and IPv6
+        can be used such as <xref target="RFC2453">RIPv2</xref>, <xref
+        target="RFC2080">RIPng</xref>, <xref target="RFC2328">OSPFv2</xref>,
+        <xref target="RFC2740">OSPFv3</xref> and <xref
+        target="RFC1195">IS-IS</xref><xref target="RFC5308"/>. Similarly, in
+        backbone network, usual dynamic routing protocol for IPv6 can be used
+        such as <xref target="RFC2080">RIPng</xref>, <xref
+        target="RFC2740">OSPFv3</xref> and <xref target="RFC5308">IS-IS</xref>
+        .</t>
+
+        <t/>
+
+        <t>If want using default route, default M46E-FP advertise the route
+        [M46E-FP address prefix/( 96 - m )] as default route. If want using
+        different default route by IPv4 network plane ID, default M46E-FP in
+        IPv4 network plane #1 advertise the route [ M46E-FP address prefix +
+        IPv4 network plane ID #1 / 96] as default route. <xref
+        target="Fig-basic-default"> </xref> in <xref target="Sec-example"/>
+        show the example using default route.</t>
+
+        <t/>
+      </section>
+    </section>
+
+    <section anchor="Sec-stackingv4net" title="Stacking IPv4 Networks">
+      <t/>
+
+      <t>M46E-FP can provide VPN like service to stub networks by using
+      different IPv4 network plane ID value.</t>
+
+      <t>If backbone network operator provide IPv4 privates network service to
+      Organization A, backbone network operator sets IPv4 network plane ID
+      value =1 to the M46E-FP which connects stub network of organization A.
+      If there are five stub network of organization A, backbone network
+      operator sets same IPv4 network plane ID = 1, to five M46E-FPs which
+      connect stub network of organization A. If there are one hundred stub
+      network of organization B, backbone network operator sets same IPv4
+      network plane ID = 2, to one hundred M46E-FPs which connect stub network
+      of organization B. If a new stub network in organization B join,
+      backbone network operator configures same IPv4 network plane ID = 2, to
+      the new stub network only, which connect stub network of organization B,
+      and no configuration is needed to one hundred M46E-FPs which are already
+      connected.</t>
+
+      <t>Such configuration, that means same stub network group to same IPv4
+      network plane ID value, is simple and easy to understand, so, it is
+      expected that possibility of misconfiguration is very low. And also,
+      number of configuration is minimum, that mean, number of configuration
+      is same as number of stub networks, and add new stub network, configure
+      to new one only.</t>
+
+      <t>Describe above, M46E-FP can provide VPN like service, for example,
+      Intranet or extranet. And, after IPv4 global address running out, some
+      service provider may want to reuse IPv4 private address. M46E-FP can
+      provide such IPv4 private address networks over single IPv6 backbone
+      network. By M46E-FP, some service providers may reuse IPv4 private
+      address.</t>
+    </section>
+
+    <section title="Redundancy of M46E-FP">
+      <t/>
+
+      <t>M46E-FP brings no limit for redundancy. <xref
+      target="Fig-redundancy"/> shows such example in case two connection
+      between backbone network and stub network. Number of link between
+      backbone network and stub network is not limited, and different type of
+      link can be used, for example, for wire and wireless.</t>
+
+      <t>Configuration of M46E-FPs, which connect same stub network, is same.
+      That mean same M46E-FP prefix and same IPv4 network plane ID value.</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-redundancy">
+          <artwork><![CDATA[
+ /---------------------------------------------------\
+ |                                                   |
+ |                  Backbone Network                 |
+ |                    (IPv6 only)                    |
+ |                                                   |
+ \---------------------------------------------------/
+       |         |                  |         |          
+   +-------+ +-------+          +-------+ +-------+       
+   |M46E-FP| |M46E-FP|          |M46E-FP| |M46E-FP| 
+   +-------+ +-------+          +-------+ +-------+  
+       |         |                  |         |        
+ /---------------------\      /---------------------\  
+ |                     |      |                     |  
+ |    Stub Network     |      |    Stub Network     |   
+ |    (IPv4 only)      |      |    (Dual Stack)     |  
+ |                     |      |                     |  
+ \---------------------/      \---------------------/ 
+]]></artwork>
+        </figure></t>
+
+      <t/>
+    </section>
+
+    <section anchor="Sec-example" title="Example of M46E-FP Operation">
+      <t/>
+
+      <section title="Basic M46E-FP Operation">
+        <t/>
+
+        <t><xref target="Fig-example-basic"/> shows M46E-FP operation which
+        does not use IPv4 network plane ID. In this example, two stub network
+        is connected to backbone network via M46E-FP. One stub network is
+        10.1.1.0/24 sub network, and the other is 10.1.2.0/24 sub network.</t>
+
+        <t>When M46E-FP receives IPv4 route advertisement, then M46E-FP
+        convert this IPv4 route to IPv6 route by address resolution to M46E-FP
+        address, and advertise this IPv6 route to backbone network. When
+        M46E-FP receives IPv6 route advertisements, then M46E-FP converts this
+        IPv6 route to IPv4 route if this IPv6 route is match M46E-FP address (
+        same prefix with M46E-FP), and advertise this IPv4 route to stub
+        network.</t>
+
+        <t>In this example. IPv4 route, 10.1.1.0/24 is converted to IPv6
+        route, &lt;M46E-FPprefix&gt;:10.1.1.0/120,and IPv4 route, 10.1.2.0/24
+        is converted to IPv6 route, &lt;M46E-FPprefix&gt;:10.1.2.0/120 at
+        M46E-FP from stub network to backbone network. And, from backbone
+        network to stub network, IPv6 route,
+        &lt;M46E-FPprefix&gt;:10.1.1.0/120 is converted to IPv4 route,
+        10.1.1.0/24, and IPv6 route, &lt;M46E-FPprefix&gt;:10.1.2.0/120 is
+        converted to IPv4 route, 10.1.2.0/24.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-example-basic">
+            <artwork><![CDATA[
+  /-------------\  +-----+  /------------\  +-----+  /-------------\
+  |Stub Network |  |     |  | Backbone   |  |     |  |Stub Network |
+  |(10.1.1.0/24)|--|M46E |--| Network    |--|M46E |--|(10.1.2.0/24)|
+  |             |  | -FP |  |(IPv6 only) |  | -FP |  |             |
+  \-------------/  +-----+  \------------/  +-----+  \-------------/
+
+ [10.1.1.0/24] ---> [<M46A prefix>:10.1.1.0/120] ---> [10.1.1.0/24]
+ [10.1.2.0/24] <--- [<M46A prefix>:10.1.2.0/120] <--- [10.1.2.0/24]
+
+
+  +---------+----+       +---------+----+----+      +---------+----+
+  | data    |IPv4|  -->  | data    |IPv4|IPv6| -->  | data    |IPv4|
+  +---------+----+       +---------+----+----+      +---------+----+
+  src: 10.1.1.1       src: <M46A prefix>:10.1.1.1     src: 10.1.1.1
+  dst: 10.1.2.1       dst: <M46A prefix>:10.1.2.1     dst: 10.1.2.1
+]]></artwork>
+          </figure></t>
+
+        <t/>
+
+        <t><xref target="Fig-basic-default"/> shows the example using default
+        route. Default route is useful in case most packets are routed same
+        path. Typically, access network is one of the example. Although using
+        default route, communication between stub networks can be done.
+        Communication between host 10.1.1.1 and host 10.1.2.1 can be done
+        inside in access network, and does not pass over default M46E-FP.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-basic-default">
+            <artwork><![CDATA[
+                            /------------\
+                            |            |
+  /-------------\  +-----+  |            |  +-----+  /-------------\
+  |  Backbone   |  |     |  | Access     |  |     |  |Stub Network |
+  |  Network    |--|M46E |--| Network    |--|M46E |--|(10.1.1.0/24)|
+  |             |  | -FP |  |(IPv6 only) |  | -FP |  |             |
+  \-------------/  +-----+  |            |  +-----+  \-------------/
+                  (default) |      <--[<M46A prefix>:10.1.1.0/120]
+             [<M46A prefix>/96] -->      |
+                            |            |
+                            |            |  +-----+  /-------------\
+                            |            |  |     |  |Stub Network |
+                            |            |--|M46E |--|(10.1.2.0/24)|
+                            |            |  | -FP |  |             |
+                            |            |  +-----+  \-------------/
+                            |      <--[<M46A prefix>:10.1.2.0/120]
+                            |            |
+                            |            |
+                            |            |  +-----+  /-------------\
+                            |            |  |     |  |Stub Network |
+                            |            |--|M46E |--|(10.1.3.0/24)|
+                            |            |  | -FP |  |             |
+                            |            |  +-----+  \-------------/
+                            |      <--[<M46A prefix>:10.1.3.0/120]
+                            |            |
+                            \------------/
+
+]]></artwork>
+          </figure></t>
+
+        <t/>
+      </section>
+
+      <section title="M46E-FP Operation with plane ID">
+        <t/>
+
+        <t><xref target="Fig-example-plane"/> shows M46E-FP operation which
+        uses IPv4 network plane ID. In this example, there are two planes, and
+        two stub network in each plane is connected to backbone network via
+        M46E-FP. In each plane, one stub network is 10.1.1.0/24 sub network,
+        and the other is 10.1.2.0/24 sub network, that means same IPv4 address
+        is used in different plane.</t>
+
+        <t>When M46E-FP receives IPv4 route advertisements, then M46E-FP
+        converts this IPv4 route to IPv6 route by address resolution to
+        M46E-FP address, and advertise this IPv6 route to backbone network.
+        When M46E-FP receives IPv6 route advertisements, then M46E-FP converts
+        this IPv6 route to IPv4 route if this IPv6 route is match M46E-FP
+        address ( same prefix with M46E-FP), and advertises this IPv4 route to
+        stub network.</t>
+
+        <t>In this example in plane #1. IPv4 route, 10.1.1.0/24 is converted
+        to IPv6 route, &lt;M46E-FPprefix&gt;&lt;#1&gt;:10.1.1.0/120,and IPv4
+        route, 10.1.2.0/24 is converted to IPv6 route,
+        &lt;M46E-FPprefix&gt;&lt;#1&gt;:10.1.2.0/120 at M46E-FP from stub
+        network to backbone network. And, from backbone network to stub
+        network, IPv6 route, &lt;M46E-FPprefix&gt;&lt;#1&gt;:10.1.1.0/120 is
+        converted to IPv4 route, 10.1.1.0/24, and IPv6 route,
+        &lt;M46E-FPprefix&gt;&lt;#1&gt;:10.1.2.0/120 is converted to IPv4
+        route, 10.1.2.0/24.</t>
+
+        <t>And also, In this example in plane #2. IPv4 route, 10.1.1.0/24 is
+        converted to IPv6 route,
+        &lt;M46E-FPprefix&gt;&lt;#2&gt;:10.1.1.0/120,and IPv4 route,
+        10.1.2.0/24 is converted to IPv6 route,
+        &lt;M46E-FPprefix&gt;&lt;#2&gt;:10.1.2.0/120 at M46E-FP from stub
+        network to backbone network. And, from backbone network to stub
+        network, IPv6 route, &lt;M46E-FPprefix&gt;&lt;#2&gt;:10.1.1.0/120 is
+        converted to IPv4 route, 10.1.1.0/24, and IPv6 route,
+        &lt;M46E-FPprefix&gt;&lt;#2&gt;:10.1.2.0/120 is converted to IPv4
+        route, 10.1.2.0/24.</t>
+
+        <t>In IPv6 space, address &lt;M46E-FPprefix&gt;&lt;#1&gt;:10.1.1.1 and
+        address &lt;M46E-FPprefix&gt;&lt;#2&gt;:10.1.1.1 are different
+        address, route &lt;M46E-FPprefix&gt;&lt;#1&gt;:10.1.1.0/120 and route
+        &lt;M46E-FPprefix&gt;&lt;#2&gt;:10.1.1.0/120 are different route,
+        although in IPv4 space, address 10.1.1.1 in plane #1 and 10.1.1.1 in
+        plane#2 are same address, route 10.1.1.0/24 in plane#1 and route
+        10.1.1.0/24 in plane#2 are same route.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-example-plane">
+            <artwork><![CDATA[
+                            /------------\
+.......<plane#1>............|............|............................
+: /-------------\  +-----+  |            |  +-----+  /-------------\ :
+: | Stub Network|  |     |  |            |  |     |  | Stub Network| :
+: |(10.1.1.0/24)|--|M46E |--| Backbone   |--|M46E |--|(10.1.2.0/24)| :
+: |             |  | -FP |  | Network    |  | -FP |  |             | :
+: \-------------/  +-----+  |(IPv6 only) |  +-----+  \-------------/ :
+:...........................|............|...........................:
+                            |            |
+........<plane#2>...........|............|............................
+: /-------------\  +-----+  |            |  +-----+  /-------------\ :
+: | Stub Network|  |     |  |            |  |     |  | Stub Network| :
+: |(10.1.1.0/24)|--|M46E |--|            |--|M46E |--|(10.1.2.0/24)| :
+: |             |  | -FP |  |            |  | -FP |  |             | :
+: \-------------/  +-----+  |            |  +-----+  \-------------/ :
+:...........................|............|...........................:
+                            \------------/
+
+
+<<plane #1>>
+
+ [10.1.1.0/24]  --> [<M46A prefix><#1>:10.1.1.0/120] --> [10.1.1.0/24]
+ [10.1.2.0/24]  <-- [<M46A prefix><#1>:10.1.2.0/120] <-- [10.1.2.0/24]
+
+  +---------+----+       +---------+----+----+       +---------+----+
+  | data    |IPv4|  -->  | data    |IPv4|IPv6|  -->  | data    |IPv4|
+  +---------+----+       +---------+----+----+       +---------+----+
+  src: 10.1.1.1      src: <M46A prefix><#1>:10.1.1.1    src: 10.1.1.1
+  dst: 10.1.2.1      dst: <M46A prefix><#1>:10.1.2.1    dst: 10.1.2.1
+
+
+<<plane#2>>
+
+ [10.1.1.0/24]  --> [<M46A prefix><#2>:10.1.1.0/120] --> [10.1.1.0/24]
+ [10.1.2.0/24]  <-- [<M46A prefix><#2>:10.1.2.0/120] <-- [10.1.2.0/24]
+
+  +---------+----+       +---------+----+----+      +---------+----+
+  | data    |IPv4|  -->  | data    |IPv4|IPv6| -->  | data    |IPv4|
+  +---------+----+       +---------+----+----+      +---------+----+
+  src: 10.1.1.1      src: <M46A prefix><#2>:10.1.1.1    src: 10.1.1.1
+  dst: 10.1.2.1      dst: <M46A prefix><#2>:10.1.2.1    dst: 10.1.2.1
+]]></artwork>
+          </figure></t>
+
+        <t/>
+
+        <t><xref target="Fig-plane-default"/>shows the example using default
+        route with IPv4 network plane. In this case, default M46E-FP may
+        configure different by each IPv4 network plane.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-plane-default">
+            <artwork><![CDATA[
+                            /------------\
+.......<plane#1>............|............|............................
+: /-------------\  +-----+  |            |  +-----+  /-------------\ :
+: | Backbone    |  |     |  |            |  |     |  | Stub Network| :
+: | Network     |--|M46E |--| Access     |--|M46E |--|(10.1.1.0/24)| :
+: |             |  | -FP |  | Network    |  | -FP |  |             | :
+: \-------------/  +-----+  |(IPv6 only) |  +-----+  \-------------/ :
+:                 (default) |    <--[<M46A prefix><#1>:10.1.1.0/120] :
+:         [<M46A prefix><#1>/96] -->     |                           :
+:                           |            |                           :
+:                           |            |                           :
+:                           |            |  +-----+  /-------------\ :
+:                           |            |  |     |  | Stub Network| :
+:                           |            |--|M46E |--|(10.1.2.0/24)| :
+:                           |            |  | -FP |  |             | :
+:                           |            |  +-----+  \-------------/ :
+:                           |   <--[<M46A prefix><#1>:10.1.2.0/120]  :
+:...........................|............|...........................:
+                            |            |
+.......<plane#2>............|............|............................
+: /-------------\  +-----+  |            |  +-----+  /-------------\ :
+: | Backbone    |  |     |  |            |  |     |  | Stub Network| :
+: | Network     |--|M46E |--|            |--|M46E |--|(10.1.1.0/24)| :
+: |             |  | -FP |  |            |  | -FP |  |             | :
+: \-------------/  +-----+  |            |  +-----+  \-------------/ :
+:                 (default) |    <--[<M46A prefix><#2>:10.1.1.0/120] :
+:         [<M46A prefix><#2>/96] -->     |                           :
+:                           |            |                           :
+:                           |            |                           :
+:                           |            |  +-----+  /-------------\ :
+:                           |            |  |     |  | Stub Network| :
+:                           |            |--|M46E |--|(10.1.2.0/24)| :
+:                           |            |  | -FP |  |             | :
+:                           |            |  +-----+  \-------------/ :
+:                           |   <--[<M46A prefix><#2>:10.1.2.0/120]  :
+:...........................|............|...........................:
+                            |            |
+                            \------------/
+
+]]></artwork>
+          </figure></t>
+
+        <t/>
+      </section>
+    </section>
+
+    <section title="Characteristic">
+      <t>M46E-FP has following useful characteristics.</t>
+
+      <t><list style="symbols">
+          <t>Reduce backbone network operation cost with IPv6 single stack (
+          at least less than Dual Stack)</t>
+
+          <t>Can allocate IPv4 address to stub networks, which used in
+          backbone network before installing M46E-FP</t>
+
+          <t>Less configuration</t>
+
+          <t>No need for special protocol</t>
+
+          <t>No dependent Layer 2 network</t>
+
+          <t>Can Stack IPv4 Private networks</t>
+
+          <t>Easy stop IPv4 operation in stub network for future ( just remove
+          M46E-FP)</t>
+
+          <t>Provide redundancy</t>
+        </list></t>
+
+      <t/>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document makes no request of IANA.</t>
+
+      <t>Note to RFC Editor: this section may be removed on publication as an
+      RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>M46E-FP use automatic Encapsulation / Decapsulation technologies.
+      Security consideration related tunneling technologies are discussed in
+      RFC2893<xref target="RFC2893"/>, RFC2267<xref target="RFC2267"/>,
+      etc.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+
+      <reference anchor="I-D.draft-matsuhira-m46a">
+        <front>
+          <title>Multiple IPv4 - IPv6 mapped IPv6 address</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization/>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.0792.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.1853.xml'?>
+
+      <?rfc ?>
+    </references>
+
+    <references>
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2893.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2267.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2453.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2080.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2328.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2740.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.1195.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.5308.xml'?>
+    </references>
+  </back>
+</rfc>
