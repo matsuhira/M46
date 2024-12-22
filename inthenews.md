@@ -1,5 +1,10 @@
 # in the news
 
+
+* 2013/12/11<br>
+【IT】 IPv4アドレスの枯渇を解決する技術の大規模実験に成功…富士通×NICT×JAIST<br>
+https://kako.5ch.net/test/read.cgi/newsplus/1386741016/<br>
+
 * 2011/8/15<br>
 Interop Tokyo 2011出展報告, NICT NEWS, 2011 6, No.405<br>
 http://www.nict.go.jp/publication/NICT-News/1106/03.html<br>
